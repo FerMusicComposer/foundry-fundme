@@ -14,8 +14,7 @@ contract FundMe {
     uint256 public constant MINIMUM_USD = 5e18;
     address public immutable i_owner;
     address[] public s_funders;
-    mapping(address funder => uint256 amountFunded)
-        public s_addressToAmountFunded;
+    mapping(address funder => uint256 amountFunded) public s_addressToAmountFunded;
 
     constructor() {
         i_owner = msg.sender;
@@ -29,20 +28,13 @@ contract FundMe {
     }
 
     function fund() public payable {
-        require(
-            msg.value.getConversionRate() >= MINIMUM_USD,
-            "didn't send enough ETH"
-        );
+        require(msg.value.getConversionRate() >= MINIMUM_USD, "didn't send enough ETH");
         s_funders.push(msg.sender);
         s_addressToAmountFunded[msg.sender] += msg.value;
     }
 
     function withdraw() public onlyOwner {
-        for (
-            uint256 funderIndex;
-            funderIndex < s_funders.length;
-            funderIndex++
-        ) {
+        for (uint256 funderIndex; funderIndex < s_funders.length; funderIndex++) {
             address funder = s_funders[funderIndex];
             s_addressToAmountFunded[funder] = 0;
         }
@@ -58,9 +50,7 @@ contract FundMe {
         // require(sendSuccess, "send operation failed");
 
         //3. call (this is the recommended way of doing it)
-        (bool callSuccess, ) = msg.sender.call{value: address(this).balance}(
-            ""
-        );
+        (bool callSuccess,) = msg.sender.call{value: address(this).balance}("");
         require(callSuccess, "Call failed");
     }
 

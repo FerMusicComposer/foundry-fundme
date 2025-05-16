@@ -12,10 +12,10 @@ contract FundMe {
     using PriceConverter for uint256;
 
     uint256 public constant MINIMUM_USD = 5e18;
-    address private immutable i_owner;
-    address[] private s_funders;
+    address public immutable i_owner;
+    address[] public s_funders;
     mapping(address funder => uint256 amountFunded)
-        private s_addressToAmountFunded;
+        public s_addressToAmountFunded;
 
     constructor() {
         i_owner = msg.sender;

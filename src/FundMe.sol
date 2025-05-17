@@ -53,7 +53,21 @@ contract FundMe {
         // require(sendSuccess, "send operation failed");
 
         //3. call (this is the recommended way of doing it)
-        (bool callSuccess,) = msg.sender.call{value: address(this).balance}("");
+        (bool callSuccess,) = payable(msg.sender).call{value: address(this).balance}("");
+        require(callSuccess, "Call failed");
+    }
+
+    function cheaperWithdraw() public onlyOwner {
+        // By storing the length in a variable, we only read from storage once, and this reduces gas cost
+        uint256 fundersLength = s_funders.length;
+
+        for (uint256 funderIndex; funderIndex < fundersLength; funderIndex++) {
+            address funder = s_funders[funderIndex];
+            s_addressToAmountFunded[funder] = 0;
+        }
+
+        s_funders = new address[](0);
+        (bool callSuccess,) = payable(msg.sender).call{value: address(this).balance}("");
         require(callSuccess, "Call failed");
     }
 

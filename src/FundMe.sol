@@ -12,10 +12,10 @@ error FundMe__NotOwner();
 contract FundMe {
     using PriceConverter for uint256;
 
-    uint256 public constant MINIMUM_USD = 5e18;
-    address public immutable i_owner;
-    address[] public s_funders;
-    mapping(address funder => uint256 amountFunded) public s_addressToAmountFunded;
+    uint256 private constant MINIMUM_USD = 5e18;
+    address private immutable i_owner;
+    address[] private s_funders;
+    mapping(address funder => uint256 amountFunded) private s_addressToAmountFunded;
     AggregatorV3Interface private s_priceFeed;
 
     constructor(address priceFeed) {
@@ -32,8 +32,8 @@ contract FundMe {
 
     function fund() public payable {
         require(msg.value.getConversionRate(s_priceFeed) >= MINIMUM_USD, "didn't send enough ETH");
-        s_funders.push(msg.sender);
         s_addressToAmountFunded[msg.sender] += msg.value;
+        s_funders.push(msg.sender);
     }
 
     function withdraw() public onlyOwner {
@@ -67,5 +67,25 @@ contract FundMe {
 
     fallback() external payable {
         fund();
+    }
+
+    /* 
+        * View functions
+    */
+
+    function getAddressToAmountFunded(address funder) external view returns (uint256) {
+        return s_addressToAmountFunded[funder];
+    }
+
+    function getFunder(uint256 index) external view returns (address) {
+        return s_funders[index];
+    }
+
+    function getMinimumUsd() external pure returns (uint256) {
+        return MINIMUM_USD;
+    }
+
+    function getOwner() external view returns (address) {
+        return i_owner;
     }
 }
